@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Enneagram Assessment — Nine Types Co.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --clay:    #2D4A3E;
+    --clay-dk: #1C3029;
+    --clay-lk: #EEF3F1;
+    --clay-xlt:#F5F8F7;
+    --parchment: #F9F5EF;
+    --ink:      #1A1A18;
+    --ink-mid:  #3D3D38;
+    --ink-lt:   #7A7A72;
+    --border:   rgba(45,74,62,0.12);
+    --border-md:rgba(45,74,62,0.22);
+    --white:    #FDFBF8;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans:  'Jost', system-ui, sans-serif;
+    --radius: 6px;
+    --radius-sm: 4px;
+  }
+  html, body { min-height: 100vh; background: #F9F5EF; font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(180,130,90,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 90% 80%, rgba(122,79,46,0.05) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+  .app { position: relative; z-index: 1; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+  .card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
+    width: 100%; max-width: 620px; padding: 3rem;
+    box-shadow: 0 2px 40px rgba(122,79,46,0.08), 0 1px 4px rgba(122,79,46,0.06);
+    min-height: 540px; display: flex; flex-direction: column;
+    animation: cardIn 0.4s ease both;
+  }
+  @keyframes cardIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Progress */
+  .progress-wrap { margin-bottom: 2rem; }
+  .progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .progress-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-lt); }
+  .progress-pct { font-size: 11px; color: var(--clay); font-weight: 500; }
+  .progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #2D4A3E; border-radius: 2px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+  /* Screens */
+  .screen { display: none; flex-direction: column; flex: 1; animation: fadeUp 0.3s ease both; }
+  .screen.active { display: flex; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Welcome */
+  .eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .eyebrow::before { content:''; display:inline-block; width:24px; height:1.5px; background:var(--clay); border-radius:1px; }
+  .welcome-title { font-family: var(--serif); font-size: 32px; font-weight: 500; line-height: 1.25; color: var(--ink); margin-bottom: 1rem; }
+  .welcome-title em { color: var(--clay-dk); font-style: italic; }
+  .welcome-body { font-size: 15px; line-height: 1.75; color: var(--ink-mid); margin-bottom: 2rem; max-width: 460px; }
+  .meta-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2.25rem; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border-md); font-size: 12px; color: var(--ink-mid); background: var(--clay-xlt); }
+  .pill svg { width:12px; height:12px; stroke:var(--clay); flex-shrink:0; }
+  .name-label { font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-lt); margin-bottom: 8px; }
+  .name-input { width: 100%; max-width: 320px; padding: 12px 16px; font-size: 15px; font-family: var(--sans); border: 1px solid var(--border-md); border-radius: var(--radius-sm); background: #F9F5EF; color: var(--ink); outline: none; margin-bottom: 1.75rem; transition: border-color 0.15s, box-shadow 0.15s; }
+  .name-input::placeholder { color: var(--ink-lt); }
+  .name-input:focus { border-color: var(--clay); box-shadow: 0 0 0 3px rgba(180,130,90,0.15); }
+
+  /* Buttons */
+  .btn-primary { display: inline-flex; align-items: center; gap: 10px; padding: 13px 28px; background: var(--clay); color: #FAF0E6; border: none; border-radius: var(--radius-sm); font-family: var(--sans); font-size: 14px; font-weight: 500; letter-spacing: 0.02em; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+  .btn-primary:hover { background: #1C3029; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-primary svg { width:16px; height:16px; stroke:currentColor; flex-shrink:0; }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; background: transparent; color: var(--ink-mid); border: 1px solid var(--border-md); border-radius: var(--radius-sm); font-family: var(--sans); font-size: 14px; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+  .btn-ghost:hover { background: var(--clay-xlt); border-color: var(--clay); }
+  .btn-ghost svg { width:14px; height:14px; stroke:currentColor; }
+
+  /* Question */
+  .q-step { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.4rem; }
+  .q-category { font-family: var(--serif); font-size: 13px; color: var(--ink-lt); font-style: italic; margin-bottom: 0.75rem; }
+  .q-text { font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.4; color: var(--ink); margin-bottom: 1.75rem; }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; background: #F9F5EF; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; font-family: var(--sans); font-size: 14px; line-height: 1.55; color: var(--ink-mid); text-align: left; transition: all 0.18s; }
+  .option-btn:hover { border-color: var(--clay); background: var(--clay-xlt); color: var(--ink); }
+  .option-btn.selected { border-color: var(--clay-dk); background: var(--clay-lk); color: var(--ink); }
+  .opt-radio { width:20px; height:20px; border-radius:50%; border:1.5px solid var(--border-md); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.18s; background:var(--white); }
+  .option-btn.selected .opt-radio { background:var(--clay-dk); border-color:var(--clay-dk); }
+  .opt-dot { width:7px; height:7px; border-radius:50%; background:#FAF0E6; opacity:0; transition:opacity 0.15s; }
+  .option-btn.selected .opt-dot { opacity:1; }
+  .nav-row { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 1.75rem; }
+
+  /* Results */
+  .result-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+  .result-eyebrow::before { content:''; display:inline-block; width:24px; height:1.5px; background:var(--clay); border-radius:1px; }
+  .result-type-name { font-family: var(--serif); font-size: 26px; font-weight: 500; color: var(--ink); margin-bottom: 0.5rem; }
+  .type-tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: var(--clay-lk); border: 1px solid var(--border-md); color: var(--clay-dk); font-size: 13px; font-weight: 500; margin-bottom: 1.25rem; }
+  .type-tag svg { width:13px; height:13px; stroke:var(--clay-dk); }
+  .result-cards { display: flex; flex-direction: column; gap: 10px; }
+  .rcard { padding: 1.1rem 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: #F9F5EF; }
+  .rcard-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.5rem; }
+  .rcard-text { font-size: 14px; line-height: 1.7; color: var(--ink-mid); }
+  .trait-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.75rem; }
+  .trait { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--white); border: 1px solid var(--border-md); color: var(--ink-mid); }
+  .scores-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.6rem; }
+  .score-chip { font-size: 12px; padding: 4px 10px; border-radius: var(--radius-sm); background: var(--white); border: 1px solid var(--border); color: var(--ink-lt); }
+  .score-chip.top { background: var(--clay-lk); border-color: var(--border-md); color: var(--clay-dk); font-weight: 500; }
+  .result-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); gap: 1rem; }
+  .footer-note { font-size: 12px; color: var(--ink-lt); line-height: 1.5; }
+  .btn-restart { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-lt); background: none; border: none; cursor: pointer; font-family: var(--sans); white-space: nowrap; transition: color 0.15s; flex-shrink: 0; }
+  .btn-restart:hover { color: var(--clay-dk); }
+  .btn-restart svg { width:13px; height:13px; stroke:currentColor; }
+
+  @media (max-width: 640px) {
+    .card { padding: 2rem 1.5rem; }
+    .welcome-title { font-size: 26px; }
+    .q-text { font-size: 18px; }
+    .result-footer { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="card" id="card">
+    <div id="progress-wrap" style="display:none" class="progress-wrap">
+      <div class="progress-meta">
+        <span class="progress-label" id="progress-label">Question 1 of 27</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div id="screen-root"></div>
+  </div>
+</div>
+
+<script>
+// ── ICONS ─────────────────────────────────────────────────────
+const IC = {
+  arrow:   `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
+  back:    `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>`,
+  clock:   `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+  list:    `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
+  spark:   `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>`,
+  refresh: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>`
+};
+
+// ── QUESTIONS ─────────────────────────────────────────────────
+const QS = [
+  {
+    category: "Assertiveness",
+    text: "How assertive are you?",
+    options: [
+      { label: "Very — I speak up and go after what I want",           types: [3,8] },
+      { label: "It depends on the situation",                          types: [1,2,3,4,5,6,7,9] },
+      { label: "Not at all — I tend to hold back",                    types: [5,9] }
+    ]
+  },
+  {
+    category: "Leadership",
+    text: "When working with others to get something done, would you rather be in charge — or would you rather not?",
+    options: [
+      { label: "In charge — I like leading and directing",             types: [1,3,8] },
+      { label: "It depends on the situation and the people involved",  types: [1,2,3,4,5,6,7] },
+      { label: "I'd rather not — I prefer to contribute than lead",   types: [5,6,9] }
+    ]
+  },
+  {
+    category: "Impulsivity",
+    text: "Are you ever impulsive?",
+    options: [
+      { label: "Very — I act on instinct and deal with it later",      types: [4,6,7,8] },
+      { label: "It depends — sometimes I jump, sometimes I don't",     types: [1,2,3,4,5,6,7,9] },
+      { label: "Not at all — I think before I act",                   types: [1,5,6] }
+    ]
+  },
+  {
+    category: "Perspective",
+    text: "Is it usually easy for you to see many sides of an issue, or do you tend to have one strong point of view?",
+    options: [
+      { label: "I naturally see many sides",                           types: [2,3,4,5,6,9] },
+      { label: "I try to, but I have a strong default perspective",    types: [1,3,4,7,8] },
+      { label: "I usually have a strong point of view and hold to it", types: [1,8] }
+    ]
+  },
+  {
+    category: "Anger",
+    text: "What is your experience of anger?",
+    options: [
+      { label: "It comes up frequently for me",                        types: [1,2,4,8] },
+      { label: "Occasionally — about average, I think",               types: [2,3,4,6,7] },
+      { label: "Rarely — I find it hard to remember the last time",   types: [5,7,9] }
+    ]
+  },
+  {
+    category: "Conflict",
+    text: "How do you deal with conflict?",
+    options: [
+      { label: "I actually like it — a good debate energises me",      types: [7,8] },
+      { label: "It's okay when necessary — I can handle it",          types: [1,2,3,4,5,6,7] },
+      { label: "I avoid it — I prefer things to stay harmonious",     types: [2,6,7,9] }
+    ]
+  },
+  {
+    category: "Self-criticism",
+    text: "How self-critical are you?",
+    options: [
+      { label: "Very — I hold myself to a high standard",             types: [1,3,4] },
+      { label: "It depends on what's at stake",                       types: [2,3,4,5,6,7,8,9] },
+      { label: "Not at all — I tend to let myself off the hook",      types: [5,7,8] }
+    ]
+  },
+  {
+    category: "Judging Others",
+    text: "Are you critical or judgmental of others?",
+    options: [
+      { label: "Yes — I have high standards and notice when they're not met", types: [1,5,8] },
+      { label: "It depends on the situation and the person",          types: [1,2,3,4,5,6,8] },
+      { label: "Not at all — I try to accept people as they are",     types: [5,6,7,9] }
+    ]
+  },
+  {
+    category: "Being Right",
+    text: "How important is it for you to be right?",
+    options: [
+      { label: "Very — I care deeply about accuracy and truth",        types: [1,3,5,8] },
+      { label: "It depends on the topic and the stakes",              types: [2,3,4,5,6,7,8,9] },
+      { label: "Not at all — being right matters less than connection", types: [2,5,6,7,9] }
+    ]
+  },
+  {
+    category: "Consistency",
+    text: "Are you usually the same person from situation to situation, or do you tend to shift how you present yourself depending on who you're around?",
+    options: [
+      { label: "I shift a lot — I adapt to read the room",            types: [2,3] },
+      { label: "I shift some, depending on comfort level",            types: [2,4,6,9] },
+      { label: "I'm pretty much the same wherever I am",              types: [1,4,5,6,7,8] }
+    ]
+  },
+  {
+    category: "Likability",
+    text: "How important is it for you to be liked?",
+    options: [
+      { label: "Very — I care about how people feel about me",        types: [2,3,9] },
+      { label: "It depends — I want respect more than popularity",    types: [1,3,4,6,9] },
+      { label: "Not very — I'd rather be honest than liked",         types: [1,4,5,6,7,8] }
+    ]
+  },
+  {
+    category: "Reading Others",
+    text: "How easy is it for you to sense or recognise what other people need?",
+    options: [
+      { label: "Very easy — I pick it up almost automatically",       types: [2,3,6] },
+      { label: "It depends on how well I know the person",            types: [1,3,4,5,6,8,9] },
+      { label: "Not easy — I have to work at it",                    types: [1,5,6,7,8] }
+    ]
+  },
+  {
+    category: "Self-awareness",
+    text: "How easy is it for you to recognise what YOU need?",
+    options: [
+      { label: "Very easy — I'm in tune with my own needs",           types: [4,5,7,8] },
+      { label: "Somewhat easy — I can figure it out if I pause",     types: [1,5,6,7] },
+      { label: "Not easy — I often don't know what I need",          types: [2,3,9] }
+    ]
+  },
+  {
+    category: "Goals",
+    text: "How important are goals to you?",
+    options: [
+      { label: "Very — I'm goal-oriented and driven by targets",      types: [1,3,5,6,8] },
+      { label: "It depends — goals help but aren't everything",       types: [2,4,5,6,7,9] },
+      { label: "Not very — I prefer to go with the flow",            types: [4,5,9] }
+    ]
+  },
+  {
+    category: "Success & Perception",
+    text: "How important is it for you to be perceived as successful?",
+    options: [
+      { label: "Very — how I'm seen matters to me",                   types: [1,3] },
+      { label: "It depends — it matters in some contexts",            types: [1,2,4,5,6,7,8,9] },
+      { label: "Not at all — I care about results, not perception",   types: [5,6,7,8] }
+    ]
+  },
+  {
+    category: "Image Management",
+    text: "Do you find yourself managing the image or impression others have of you?",
+    options: [
+      { label: "Often — I'm conscious of how I come across",          types: [2,3] },
+      { label: "Sometimes — in certain situations or with certain people", types: [1,2,3,4,6,9] },
+      { label: "Not at all — I don't think about it much",            types: [5,6,7,8,9] }
+    ]
+  },
+  {
+    category: "Emotional Attunement",
+    text: "To what degree are you in touch with your emotions?",
+    options: [
+      { label: "Very — I feel things deeply and am aware of them",    types: [2,4] },
+      { label: "It depends — sometimes clear, sometimes not",         types: [1,2,3,4,5,6,7,8,9] },
+      { label: "Not much — I tend to stay in my head more than my heart", types: [1,3,5,6,7,8] }
+    ]
+  },
+  {
+    category: "Comparison",
+    text: "Do you compare yourself to others?",
+    options: [
+      { label: "Yes — I often measure myself against those around me", types: [2,3,4] },
+      { label: "It depends — only in areas I care about",             types: [1,5,6,9] },
+      { label: "Not at all — I don't really think in those terms",    types: [1,5,6,7,8,9] }
+    ]
+  },
+  {
+    category: "Uniqueness",
+    text: "How important is it for you to be unique or stand out?",
+    options: [
+      { label: "Very — I want to be seen as different, not generic",  types: [4,7] },
+      { label: "Somewhat — I like having my own style",               types: [2,3,5] },
+      { label: "Not at all — I'd rather fit in and get things done",  types: [1,2,3,6,8,9] }
+    ]
+  },
+  {
+    category: "Privacy",
+    text: "How important is privacy to you?",
+    options: [
+      { label: "Very — I keep a lot to myself",                       types: [3,4,5,6] },
+      { label: "Somewhat — I share selectively",                      types: [1,3,4,7,8,9] },
+      { label: "Not important — I'm an open book",                    types: [2,7,8,9] }
+    ]
+  },
+  {
+    category: "Alone Time",
+    text: "How much alone time do you need each day?",
+    options: [
+      { label: "A lot — ideally at least an hour to recharge",        types: [5,6,9] },
+      { label: "Some — I can take it or leave it",                    types: [1,3,4,5,6,7,8,9] },
+      { label: "None — I get energy from being around people",        types: [2,7] }
+    ]
+  },
+  {
+    category: "Social Style",
+    text: "In social situations, do you tend to be more of an observer or more of a participant?",
+    options: [
+      { label: "Observer — I watch and listen more than I engage",    types: [4,5,6,9] },
+      { label: "It depends on my comfort level and who's there",      types: [1,2,3,4,6,7,8,9] },
+      { label: "Participant — I'm in the mix, driving conversation",  types: [1,2,3,4,7,8] }
+    ]
+  },
+  {
+    category: "Fear",
+    text: "What role does fear play in your life?",
+    options: [
+      { label: "I have various fears that influence my decisions",     types: [1,3,5,6] },
+      { label: "Only 'normal' fears — nothing that holds me back much", types: [1,2,3,4,5,7,8,9] },
+      { label: "I don't really experience fear",                      types: [7,8,9] }
+    ]
+  },
+  {
+    category: "Trust",
+    text: "Is it easy for you to trust others, or does it take a while?",
+    options: [
+      { label: "Easy — I give people the benefit of the doubt",       types: [2,3,4,7,9] },
+      { label: "It depends on the person and context",                types: [1,2,3,4,5,6,7,8,9] },
+      { label: "Takes a while — I need to see it before I trust it",  types: [1,5,6,8] }
+    ]
+  },
+  {
+    category: "Self-doubt",
+    text: "Do you tend to doubt yourself?",
+    options: [
+      { label: "Yes — I second-guess myself often",                   types: [4,6,9] },
+      { label: "It depends — in some areas more than others",         types: [1,2,3,4,5,6,7,8,9] },
+      { label: "Not at all — I back myself",                         types: [1,3,5,7,8] }
+    ]
+  },
+  {
+    category: "Outlook",
+    text: "Are you more of an optimist or more of a pessimist?",
+    options: [
+      { label: "Optimist — I lead with possibility",                  types: [2,3,7] },
+      { label: "Realist — I see things as they are",                  types: [1,3,4,5,6,8,9] },
+      { label: "Pessimist — I tend to expect the worst",              types: [4,5,6] }
+    ]
+  },
+  {
+    category: "Freedom",
+    text: "How important is it for you to keep your options open and have freedom in what you do?",
+    options: [
+      { label: "Very — I need flexibility and resist being boxed in",  types: [7] },
+      { label: "It depends — some structure is fine",                  types: [3,4,6,8,9] },
+      { label: "Not at all — I prefer clarity and commitment",         types: [1,2,3,5,6,8,9] }
+    ]
+  },
+  {
+    category: "Fun & Play",
+    text: "How important is it for you to have fun and recreation in your daily life?",
+    options: [
+      { label: "Very — it's non-negotiable for me",                   types: [2,7,8] },
+      { label: "It depends — I enjoy it but can do without",          types: [1,2,3,4,5,6,8,9] },
+      { label: "Not a priority — I'm more focused on work or purpose", types: [1,3,5] }
+    ]
+  },
+  {
+    category: "Thinking Style",
+    text: "Are you the type of person who lives in their mind — always thinking through or puzzling over a problem?",
+    options: [
+      { label: "Very much — my mind is always working",               types: [1,3,5,6,7] },
+      { label: "It depends — sometimes analytical, sometimes just present", types: [1,3,4,8,9] },
+      { label: "Not really — I'm more instinct or feeling driven",    types: [2,4,9] }
+    ]
+  },
+  {
+    category: "Relationships",
+    text: "How central are your relationships in your day-to-day life?",
+    options: [
+      { label: "Very — people and connection are at the heart of everything", types: [2,4,6,9] },
+      { label: "It depends — important but not at the expense of work",    types: [1,3,4,6,7,8,9] },
+      { label: "Not central — I value independence and solitude",          types: [1,5,6,7,8,9] }
+    ]
+  },
+  {
+    category: "Task vs. People",
+    text: "Are you more task-oriented or more people-oriented?",
+    options: [
+      { label: "Task — I'm focused on getting things done",           types: [1,3,8] },
+      { label: "It depends — both matter to me equally",              types: [3,4,5,6,7,8,9] },
+      { label: "People — relationships come first for me",            types: [2,9] }
+    ]
+  },
+  {
+    category: "Authority",
+    text: "How do you respond to being told what to do?",
+    options: [
+      { label: "Honestly, I really dislike it",                       types: [4,6,7,8,9] },
+      { label: "Fine, as long as they're competent and it makes sense", types: [1,2,3,4,5,6,8,9] },
+      { label: "I welcome it — give me clear direction and I'll deliver", types: [1,2,3,5,6] }
+    ]
+  }
+];
+
+const TOTAL = QS.length;
+
+// ── TYPE DATA ─────────────────────────────────────────────────
+const TD = {
+  1: { name:"The Reformer",    core:"Principled, purposeful, self-controlled, and perfectionistic. You hold yourself and others to high standards and have a clear sense of right and wrong.",                  communication:"You communicate clearly and directly, with precision and integrity. In teams, you raise the bar — but be mindful that your critique can land harder than you intend.",       growth:"Practice letting 'good enough' be enough. Your perfectionism drives quality, but it can also block connection and slow momentum.",              traits:["Detail-oriented","Ethical","Disciplined","High standards","Principled"] },
+  2: { name:"The Helper",      core:"Caring, warm, generous, and deeply attuned to others. You give freely — but sometimes at the cost of your own needs, which can quietly build resentment.",               communication:"You communicate with warmth and emotional intelligence. In teams, you build trust and belonging — but learn to name your own needs as clearly as you sense others'.",    growth:"Ask yourself: what do I actually need right now? Giving from a full cup creates genuine connection — giving from empty creates expectations.",   traits:["Empathetic","Generous","Supportive","Warm","Relationship-focused"] },
+  3: { name:"The Achiever",    core:"Success-oriented, pragmatic, and driven. You adapt and excel in almost any room — but can lose touch with your authentic self in pursuit of achievement.",                communication:"You communicate efficiently and persuasively. In teams, you drive momentum and inspire action — but slow down to include others emotionally, not just practically.",      growth:"Separate your worth from your output. Who are you when you're not achieving? That's the person your team most wants to connect with.",           traits:["Goal-driven","Adaptable","Charismatic","Efficient","Results-focused"] },
+  4: { name:"The Individualist",core:"Expressive, creative, and emotionally deep. You experience life intensely and long to be truly seen and understood — and to create meaning from everything.",             communication:"You communicate authentically and with emotional depth. In teams, you bring originality and real feeling — but may withdraw when you feel unseen or misunderstood.",     growth:"Not every moment needs to be extraordinary. Let the ordinary be enough, and let people in even when you haven't figured out how you feel yet.",  traits:["Creative","Emotionally deep","Authentic","Sensitive","Introspective"] },
+  5: { name:"The Investigator",core:"Perceptive, analytical, and deeply private. You prefer to observe before engaging, and knowledge is your safe harbour. You conserve energy and guard your inner world closely.", communication:"You communicate thoughtfully and precisely when you do. In teams, you bring rare insight — but others may need more presence and warmth from you to feel connected.", growth:"Share your thinking before it's fully formed. Imperfect ideas shared early build more connection than polished ones delivered late.",             traits:["Analytical","Perceptive","Private","Independent","Curious"] },
+  6: { name:"The Loyalist",    core:"Loyal, responsible, and highly attuned to risk. You scan your environment for what could go wrong, and your commitment to the people you trust runs deep.",                communication:"You communicate carefully and with genuine loyalty. In teams, you keep people safe and prepared — but learn to trust your own judgment as much as you trust others'.",  growth:"Notice when anxiety is steering your decisions. You are more capable and more trusted than your doubts suggest.",                                traits:["Loyal","Dependable","Cautious","Team-oriented","Prepared"] },
+  7: { name:"The Enthusiast",  core:"Spontaneous, energetic, and endlessly curious. You move toward joy and away from pain — often quickly. You see possibility everywhere, and want to experience all of it.", communication:"You communicate with infectious energy and optimism. In teams, you unlock creativity and possibility — but follow-through and depth matter as much as the spark.",   growth:"Sit with discomfort a little longer. Some of the best things — and deepest connections — come from staying when it gets hard.",                  traits:["Energetic","Optimistic","Spontaneous","Versatile","Vision-driven"] },
+  8: { name:"The Challenger",  core:"Confident, decisive, and protective. You lead with strength and aren't afraid of confrontation. You have a natural authority — and a fierce loyalty to those you care about.", communication:"You communicate directly and boldly. In teams, you drive action and clarity — but others may need more gentleness to feel safe enough to be fully open with you.", growth:"Vulnerability is not weakness. Letting people see your softer side doesn't cost you respect — it earns a deeper kind.",                         traits:["Direct","Confident","Decisive","Protective","Bold"] },
+  9: { name:"The Peacemaker",  core:"Receptive, patient, and harmony-seeking. You have a rare gift for making everyone feel included — but you can lose your own voice and priorities in the process.",          communication:"You communicate calmly and openly. In teams, you hold space for everyone — but your perspective matters too, and people want to hear it.",                              growth:"Your voice has value. Practice stating what you want before you ask what others want. The team needs your presence, not just your peace.",        traits:["Peaceful","Receptive","Diplomatic","Patient","Open-minded"] }
+};
+
+// ── STATE ─────────────────────────────────────────────────────
+let S = { screen:'welcome', name:'', q:0, answers:[] };
+
+// ── SCORE ─────────────────────────────────────────────────────
+function calcScore() {
+  const sc = {};
+  for (let t=1;t<=9;t++) sc[t]=0;
+  S.answers.forEach(a => { if(a) a.types.forEach(t => sc[t]++); });
+  const sorted = Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+  return { sc, top:parseInt(sorted[0][0]), sorted };
+}
+
+// ── UTIL ──────────────────────────────────────────────────────
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── RENDER ───────────────────────────────────────────────────
+function render() {
+  const root = document.getElementById('screen-root');
+  const pw   = document.getElementById('progress-wrap');
+  const pf   = document.getElementById('progress-fill');
+  const pl   = document.getElementById('progress-label');
+  const pp   = document.getElementById('progress-pct');
+
+  if (S.screen === 'welcome') {
+    pw.style.display = 'none';
+    root.innerHTML = renderWelcome();
+  } else if (S.screen === 'question') {
+    pw.style.display = 'block';
+    const pct = Math.round((S.q / TOTAL) * 100);
+    pf.style.width = pct + '%';
+    pl.textContent = `Question ${S.q+1} of ${TOTAL}`;
+    pp.textContent = pct + '%';
+    root.innerHTML = renderQuestion();
+  } else {
+    pw.style.display = 'block';
+    pf.style.width = '100%';
+    pl.textContent = 'Complete';
+    pp.textContent = '100%';
+    root.innerHTML = renderResult();
+  }
+}
+
+function renderWelcome() {
+  return `<div class="screen active">
+    <div class="eyebrow">Nine Types Co. · Enneagram Assessment</div>
+    <h1 class="welcome-title">Know yourself.<br><em>Connect better.</em></h1>
+    <p class="welcome-body">This assessment helps you discover your natural communication style — how you think, how you engage, and how you show up under pressure. There are no right or wrong answers, only honest ones.</p>
+    <div class="meta-pills">
+      <span class="pill">${IC.list} ${TOTAL} questions</span>
+      <span class="pill">${IC.clock} About 10–15 minutes</span>
+      <span class="pill">${IC.spark} Personal insights report</span>
+    </div>
+    <div class="name-label">Your first name</div>
+    <input class="name-input" type="text" id="name-field" placeholder="e.g. Sarah" value="${esc(S.name)}"
+      oninput="S.name=this.value; document.getElementById('start-btn').disabled=this.value.trim().length<1"
+      autocomplete="given-name" />
+    <div>
+      <button class="btn-primary" id="start-btn" onclick="startQ()" ${S.name.trim().length<1?'disabled':''}>
+        Begin ${IC.arrow}
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderQuestion() {
+  const q = QS[S.q];
+  const sel = S.answers[S.q];
+  return `<div class="screen active">
+    <div class="q-step">Question ${S.q+1} of ${TOTAL}</div>
+    <div class="q-category">${esc(q.category)}</div>
+    <div class="q-text">${esc(q.text)}</div>
+    <div class="options">
+      ${q.options.map((o,i) => `
+        <button class="option-btn ${sel&&sel.i===i?'selected':''}" onclick="pick(${i})">
+          <div class="opt-radio"><div class="opt-dot"></div></div>
+          ${esc(o.label)}
+        </button>`).join('')}
+    </div>
+    <div class="nav-row">
+      ${S.q>0?`<button class="btn-ghost" onclick="goBack()">${IC.back} Back</button>`:''}
+      <button class="btn-primary" id="next-btn" onclick="goNext()" ${sel===undefined?'disabled':''}>
+        ${S.q===TOTAL-1?'See my results':'Next'} ${IC.arrow}
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderResult() {
+  const {sorted, top} = calcScore();
+  const t = TD[top];
+  const top3 = sorted.slice(0,3);
+  return `<div class="screen active">
+    <div class="result-eyebrow">Your results, ${esc(S.name)}</div>
+    <div class="result-type-name">Type ${top} — ${esc(t.name)}</div>
+    <div class="type-tag">${IC.spark} Enneagram type ${top}</div>
+    <div class="result-cards">
+      <div class="rcard">
+        <div class="rcard-label">Who you are</div>
+        <div class="rcard-text">${esc(t.core)}</div>
+        <div class="trait-row">${t.traits.map(tr=>`<span class="trait">${esc(tr)}</span>`).join('')}</div>
+      </div>
+      <div class="rcard">
+        <div class="rcard-label">How you communicate</div>
+        <div class="rcard-text">${esc(t.communication)}</div>
+      </div>
+      <div class="rcard">
+        <div class="rcard-label">Your growth edge</div>
+        <div class="rcard-text">${esc(t.growth)}</div>
+      </div>
+      <div class="rcard">
+        <div class="rcard-label">Top type matches</div>
+        <div class="scores-wrap">
+          ${top3.map((s,i)=>`<span class="score-chip ${i===0?'top':''}">Type ${s[0]} &mdash; ${s[1]} pt${s[1]!==1?'s':''}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="result-footer">
+      <p class="footer-note">Your top type scored highest across ${TOTAL} questions. The full picture includes your wing types and stress/growth lines.</p>
+      <button class="btn-restart" onclick="restart()">${IC.refresh} Start over</button>
+    </div>
+  </div>`;
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────
+function startQ()  { if(!S.name.trim()) return; S.screen='question'; S.q=0; render(); }
+function pick(i)   { S.answers[S.q]={i, types:QS[S.q].options[i].types}; render(); }
+function goNext()  { if(S.answers[S.q]===undefined) return; if(S.q<TOTAL-1){S.q++;render();}else{S.screen='result';render();} }
+function goBack()  { if(S.q>0){S.q--;render();} }
+function restart() { S={screen:'welcome',name:S.name,q:0,answers:[]}; render(); }
+
+render();
+</script>
+</body>
+</html>
